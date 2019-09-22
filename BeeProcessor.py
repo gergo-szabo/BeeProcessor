@@ -5,7 +5,7 @@ import tensorflow as tf
 
 class BeeProcessor():
     'Process bee related images'
-    def __init__(self, image, vertices, blurriness_threshold=300,
+    def __init__(self, input_dim, vertices, blurriness_threshold=300,
                  model_weights="Models/FCN_v6_weights-672-0.3838.hdf5",
                  lower_thresh=0.3, upper_thresh=1, min_size=6):
         'Initialization'
@@ -15,8 +15,8 @@ class BeeProcessor():
         self.errorMsg = ''
         
         # Image to be processed
-        self.input = image
-        self.input_dim = image.shape
+        self.input = None
+        self.input_dim = input_dim
         
         # Vertices of the Region of Interest
         self.vertices = vertices
@@ -26,21 +26,20 @@ class BeeProcessor():
         self.vy_max = vertices[0, :, 1].max()
         
         # Region of Interest
-        self.roi, self.strict_roi = self.region_of_interest()
+        self.roi = None
+        self.strict_roi = None
+        self.strict_roi_shape = (self.vy_max-self.vy_min, self.vx_max-self.vx_min, self.input_dim[2])
         
         # Blurriness check
         self.blurriness_threshold = blurriness_threshold
-        self.check_blurriness()
         
         # Variables related to breaking up image to segments
         self.side = 200
         self.halfside = self.side / 2
-        self.a = math.floor(self.strict_roi.shape[0] / 200)
-        self.b = math.floor(self.strict_roi.shape[1] / 200)
+        self.a = math.floor(self.strict_roi_shape[0] / self.side)
+        self.b = math.floor(self.strict_roi_shape[1] / self.side)
         self.segment_nbr = self.a * self.b
         self.grid = np.mgrid[0:self.a,0:self.b]*self.side + self.halfside
-        self.segments = self.make_segments_for_NN()
-        self.check_segments()
         
         # NN prediction
         self.model = 0
