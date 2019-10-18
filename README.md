@@ -1,5 +1,7 @@
 # BeeProcessor
- A set of useful functions to process pictures of bees. Mainly for private use.
+A set of useful functions to process pictures of bees. The poistion output is used by a private project (traffic counting).
+
+The NN model was only trained on a small set and outdated. Contact me if you are interested in a more refined version.
 
 ## Bee position estimation
 
